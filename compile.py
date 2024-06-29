@@ -495,6 +495,7 @@ if write_id_files is not None:
             'factions': (WRECK.fac, 'fac_'),
             'info_pages': (WRECK.ip, 'ip_'),
             'menus': (WRECK.mnu, 'mnu_'),
+			'meshes': (WRECK.mesh, 'mesh_'),
             'mission_templates': (WRECK.mt, 'mt_'),
             'music': (WRECK.track, 'track_'),
             'particle_systems': (WRECK.psys, 'psys_'),
