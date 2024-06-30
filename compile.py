@@ -5,7 +5,7 @@ from time import time as gettime
 import sys
 
 sys.path.insert(0, os.path.abspath('./mods'))
-sys.path.insert(0, os.path.abspath('./mods/diplomacy'))
+#sys.path.insert(0, os.path.abspath('./mods/diplomacy'))
 sys.path.insert(0, os.path.abspath('./headers'))
 sys.path.insert(0, os.path.abspath('./mod_manager'))
 sys.path.insert(0, os.path.abspath('./mod_merger'))
@@ -51,13 +51,13 @@ print
 
 print 'Exporting list types in first pass...'
 
-             # Info module and plugins
-WRECK.destination = "../" #this is the export dir
+# Info module and plugins
+WRECK.destination = "../"  # this is the export dir
 globals().update(WRECK.syntax_extensions)
 globals().update(WRECK.plugin_globals)
-     # STEP 1
-WRECK.current_module = 'meshes'
+# STEP 1
 from module_meshes import *
+WRECK.current_module = 'meshes'
 WRECK.mesh[7] = meshes
 calculate_identifiers(meshes, mesh)
 if write_id_files is not None:
@@ -75,8 +75,8 @@ if write_id_files is not None:
         print '{1}FAILED.\nCOMPILER INTERNAL ERROR WHILE WRECKING {module!s}:\n{error!s}{0}'.format(
             *COLORAMA, module=write_id_files % entity_name, error=formatted_exception())
         raise MSException()
-WRECK.current_module = 'map_icons'
 from module_map_icons import *
+WRECK.current_module = 'map_icons'
 WRECK.icon[7] = map_icons
 calculate_identifiers(map_icons, icon)
 if write_id_files is not None:
@@ -94,18 +94,33 @@ if write_id_files is not None:
         print '{1}FAILED.\nCOMPILER INTERNAL ERROR WHILE WRECKING {module!s}:\n{error!s}{0}'.format(
             *COLORAMA, module=write_id_files % entity_name, error=formatted_exception())
         raise MSException()
-WRECK.current_module = 'items'
 from module_items import *
-WRECK.current_module = 'troops'
+WRECK.current_module = 'items'
 from module_troops import *
-WRECK.current_module = 'party_templates'
-from module_party_templates import *
-     # STEP 2
-WRECK.itm[7] = items
+WRECK.current_module = 'troops'
 WRECK.trp[7] = troops
+calculate_identifiers(troops, trp)
+if write_id_files is not None:
+    export = {
+        'troops': (WRECK.trp, 'trp_'),
+    }
+    try:
+        for entity_name, (entity, prefix) in export.iteritems():
+            contents = '\n'.join(['%s%s = %d' % (prefix, ref, index) for ref, index in sorted(map(
+                lambda i:(i[0], int(i[1] & 0xFFFFFFFF)), entity[0].iteritems()), lambda x, y:cmp(x[1], y[1]))])
+            with open(write_id_files % entity_name, 'w+b') as f:
+                f.write(contents)
+                f.write('\n')
+    except Exception, e:
+        print '{1}FAILED.\nCOMPILER INTERNAL ERROR WHILE WRECKING {module!s}:\n{error!s}{0}'.format(
+            *COLORAMA, module=write_id_files % entity_name, error=formatted_exception())
+        raise MSException()
+from module_party_templates import *
+WRECK.current_module = 'party_templates'
+# STEP 2
+WRECK.itm[7] = items
 WRECK.pt[7] = party_templates
 calculate_identifiers(items, itm)
-calculate_identifiers(troops, trp)
 calculate_identifiers(party_templates, pt)
 if write_id_files is not None:
     export = {
